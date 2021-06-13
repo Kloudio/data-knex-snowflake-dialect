@@ -1,15 +1,16 @@
 import * as Bluebird from "bluebird";
-import * as Knex from "knex";
+import knex , { Knex } from "knex";
 import { defer, fromPairs, isArray, map, toPairs } from "lodash";
 
 import { QueryCompiler } from "./query/QueryCompiler";
 import { SchemaCompiler, TableCompiler } from "./schema";
 import * as ColumnBuilder from "knex/lib/schema/columnbuilder";
-import * as ColumnCompiler_MySQL from "knex/lib/dialects/mysql/schema/columncompiler";
-import * as Transaction from "knex/lib/transaction";
+import * as ColumnCompiler_MySQL from "knex/lib/dialects/mysql/schema/mysql-columncompiler";
+import * as Transaction from "knex/lib/execution/transaction";
 import { promisify } from "util";
 
-export class SnowflakeDialect extends Knex.Client {
+class SnowflakeDialect extends knex.Client {
+
   constructor(config = {} as any) {
     if (config.connection) {
       if (config.connection.user && !config.connection.username) {
@@ -28,13 +29,6 @@ export class SnowflakeDialect extends Knex.Client {
     super(config);
   }
 
-  public get dialect() {
-    return "snowflake";
-  }
-
-  public get driverName() {
-    return "snowflake-sdk";
-  }
 
   transaction(container: any, config: any, outerTx: any): Knex.Transaction {
     const transax = new Transaction(this, container, config, outerTx);
@@ -120,15 +114,17 @@ export class SnowflakeDialect extends Knex.Client {
   // Get a raw connection, called by the `pool` whenever a new
   // connection needs to be added to the pool.
   acquireRawConnection() {
-    return new Bluebird((resolver, rejecter) => {
+    return new Promise((resolver, rejecter) => {
       // @ts-ignore
       const connection = this.driver.createConnection(this.connectionSettings);
       connection.on('error', (err) => {
+        console.log('error occurred connecting to snowflake', err);
         connection.__knex__disposed = err;
       });
       connection.connect((err) => {
         if (err) {
           // if connection is rejected, remove listener that was registered above...
+          console.log('error connecting to snowflake', err);
           connection.removeAllListeners();
           return rejecter(err);
         }
@@ -246,3 +242,8 @@ export class SnowflakeDialect extends Knex.Client {
   }
 
 }
+
+SnowflakeDialect.prototype.driverName = 'snowflake-sdk';
+SnowflakeDialect.prototype.dialect = 'snowflake';
+
+export {SnowflakeDialect}

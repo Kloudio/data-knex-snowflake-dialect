@@ -1,13 +1,9 @@
 import * as Bluebird from "bluebird";
-import * as Knex from "knex";
+import knex, { Knex } from "knex";
 import { QueryCompiler } from "./query/QueryCompiler";
 import { SchemaCompiler, TableCompiler } from "./schema";
-export declare class SnowflakeDialect extends Knex.Client {
+declare class SnowflakeDialect extends knex.Client {
     constructor(config?: any);
-    // @ts-ignore
-    get dialect(): string;
-    // @ts-ignore
-    get driverName(): string;
     transaction(container: any, config: any, outerTx: any): Knex.Transaction;
     queryCompiler(builder: any): QueryCompiler;
     columnBuilder(tableBuilder: any, type: any, args: any): any;
@@ -15,7 +11,7 @@ export declare class SnowflakeDialect extends Knex.Client {
     tableCompiler(tableBuilder: any): TableCompiler;
     schemaCompiler(builder: any): SchemaCompiler;
     _driver(): any;
-    acquireRawConnection(): Bluebird<unknown>;
+    acquireRawConnection(): Promise<unknown>;
     destroyRawConnection(connection: any): Promise<void>;
     validateConnection(connection: any): Promise<boolean>;
     _query(connection: any, obj: any): Bluebird<unknown>;
@@ -23,3 +19,4 @@ export declare class SnowflakeDialect extends Knex.Client {
     postProcessResponse(result: any, queryContext: any): any;
     customWrapIdentifier(value: any, origImpl: any, queryContext: any): any;
 }
+export { SnowflakeDialect };
