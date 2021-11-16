@@ -55,7 +55,7 @@
     "bluebird": "^3.7.2",
     "knex": "^0.95.6",
     "lodash": "^4.17.15",
-    "snowflake-sdk": "1.6.0"
+    "snowflake-sdk": "1.6.3"
   },
   "devDependencies": {
     "@types/bluebird": "3.5.29",
